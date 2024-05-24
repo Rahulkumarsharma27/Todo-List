@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color: #fff;
+        font-size: 62.5%;
+      }
+      body {
+        font-family: "Urbanist", sans-serif;
+        background-color: #1b1b1d;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 3.6rem;
+        margin-bottom: 2.4rem;
+        text-align: center;
+      }
+      p,
+      li,
+      input,
+      button {
+        font-size: 1.7rem;
+        letter-spacing: 0.1rem;
+        font-family: "Urbanist", sans-serif;
+        line-height: 1.6;
+      }
+      input {
+        border-radius: 10px;
+        margin-right: 10px;
+        padding: 0.6rem 2.4rem;
+        width: 40vh;
+      }
+      button {
+        background-color: #f5ee62;
+        padding: 0.6rem 2.4rem;
+        border-radius: 10rem;
+        margin-left: 1rem;
+        cursor: pointer;
+        transition: all 0.3s linear;
+        border: none;
+      }
+      button:hover {
+        box-shadow: inset 0 0 0 0.2rem #f5ee62;
+        background-color: transparent;
+        color: #f5ee62;
+      }
+      .container {
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+      }
+      form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+      }
+      .todo-lists-elem {
+        margin-top: 2rem;
+        list-style-type: none;
+        padding: 0;
+      }
+      .main_todo_div {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        width: 40rem;
+      }
+      .main_todo_div li {
+        margin: 0;
+      }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TODO LIST PROJECT</h1>
+        <form id="todo-form">
+            <input type="text" id="inputValue" />
+            <button type="submit">Add TODO</button>
+        </form>
+        <section id="todoLists" class="todo-lists-elem">
+            <!-- TODO items will appear here -->
+        </section>
+    </div>
+
+    <script>
+        const mainTodoElem = document.querySelector("#todoLists");
+        const inputValue = document.getElementById("inputValue");
+        const todoForm = document.getElementById("todo-form");
+
+        const saveTodosToLocalStorage = (todos) => {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        };
+
+        const getTodosFromLocalStorage = () => {
+            const savedTodos = localStorage.getItem('todos');
+            return savedTodos ? JSON.parse(savedTodos) : [];
+        };
+
+        const renderTodos = (todos) => {
+            mainTodoElem.innerHTML = '';
+            todos.forEach((todo) => {
+                const divElem = document.createElement("div");
+                divElem.classList.add("main_todo_div");
+                divElem.innerHTML = `<li>${todo}</li> <button class="btnclass">Delete</button>`;
+                
+                divElem.querySelector(".btnclass").addEventListener("click", () => {
+                    removeTodoFromLocalStorage(todo);
+                    mainTodoElem.removeChild(divElem);
+                });
+
+                mainTodoElem.append(divElem);
+            });
+        };
+
+        const addTodoList = (e) => {
+            e.preventDefault();
+            const todoText = inputValue.value.trim();
+            if (todoText === "") {
+                alert("Please enter a TODO item");
+                return;
+            }
+            const todos = getTodosFromLocalStorage();
+            todos.push(todoText);
+            saveTodosToLocalStorage(todos);
+            renderTodos(todos);
+            inputValue.value = "";
+        };
+
+        const removeTodoFromLocalStorage = (todoToRemove) => {
+            let todos = getTodosFromLocalStorage();
+            todos = todos.filter((todo) => todo !== todoToRemove);
+            saveTodosToLocalStorage(todos);
+            renderTodos(todos);
+        };
+
+        todoForm.addEventListener('submit', addTodoList);
+
+        // Initial render of todos
+        document.addEventListener('DOMContentLoaded', () => {
+            const todos = getTodosFromLocalStorage();
+            renderTodos(todos);
+        });
+    </script>
+</body>
+</html>
